@@ -37,14 +37,17 @@ class MyWindow(Gtk.Window):
         self.nowPlayingTrackTitle = Gtk.Label()
         self.nowPlayingTrackTitle.set_markup("<b>Title</b>")
         self.nowPlayingTrackTitle.set_justify(Gtk.Justification.CENTER)
+        self.nowPlayingTrackTitle.set_line_wrap(True)
         self.nowPlayingTrackText.add(self.nowPlayingTrackTitle)
 
         self.nowPlayingTrackArtist = Gtk.Label("Artist")
         self.nowPlayingTrackArtist.set_justify(Gtk.Justification.CENTER)
+        self.nowPlayingTrackArtist.set_line_wrap(True)
         self.nowPlayingTrackText.add(self.nowPlayingTrackArtist)
 
         self.nowPlayingTrackAlbum = Gtk.Label("Album")
         self.nowPlayingTrackAlbum.set_justify(Gtk.Justification.CENTER)
+        self.nowPlayingTrackAlbum.set_line_wrap(True)
         self.nowPlayingTrackText.add(self.nowPlayingTrackAlbum)
 
         self.nowPlayingTrackDisplay.add(self.nowPlayingTrackText)
@@ -68,7 +71,7 @@ class MyWindow(Gtk.Window):
         self.nowPlayingControls = Gtk.Box(spacing=6)
         self.controlButtonPrevious = Gtk.Button()
         self.controlButtonPrevious.add(
-        	Gtk.Image.new_from_icon_name(
+            Gtk.Image.new_from_icon_name(
                 "media-skip-backward",
                 Gtk.IconSize.BUTTON
             )
@@ -78,7 +81,7 @@ class MyWindow(Gtk.Window):
 
         self.controlButtonPlayPause = Gtk.Button()
         self.controlButtonPlayPause.add(
-        	Gtk.Image.new_from_icon_name(
+            Gtk.Image.new_from_icon_name(
                 "media-playback-start",
                 Gtk.IconSize.BUTTON
             )
@@ -88,7 +91,7 @@ class MyWindow(Gtk.Window):
 
         self.controlButtonStop = Gtk.Button()
         self.controlButtonStop.add(
-        	Gtk.Image.new_from_icon_name(
+            Gtk.Image.new_from_icon_name(
                 "media-playback-stop",
                 Gtk.IconSize.BUTTON
             )
@@ -98,7 +101,7 @@ class MyWindow(Gtk.Window):
 
         self.controlButtonNext = Gtk.Button()
         self.controlButtonNext.add(
-        	Gtk.Image.new_from_icon_name(
+            Gtk.Image.new_from_icon_name(
                 "media-skip-forward",
                 Gtk.IconSize.BUTTON
             )
@@ -108,7 +111,7 @@ class MyWindow(Gtk.Window):
 
         self.controlButtonRepeat = Gtk.ToggleButton()
         self.controlButtonRepeat.add(
-        	Gtk.Image.new_from_icon_name(
+            Gtk.Image.new_from_icon_name(
                 "media-playlist-repeat",
                 Gtk.IconSize.BUTTON
             )
@@ -118,7 +121,7 @@ class MyWindow(Gtk.Window):
 
         self.controlButtonShuffle = Gtk.ToggleButton()
         self.controlButtonShuffle.add(
-        	Gtk.Image.new_from_icon_name(
+            Gtk.Image.new_from_icon_name(
                 "media-playlist-shuffle",
                 Gtk.IconSize.BUTTON
             )
@@ -128,8 +131,8 @@ class MyWindow(Gtk.Window):
 
         self.nowPlayingPage.add(self.nowPlayingControls)
         self.notebook.append_page(
-        	self.nowPlayingPage, 
-        	Gtk.Image.new_from_icon_name(
+            self.nowPlayingPage, 
+            Gtk.Image.new_from_icon_name(
                 "media-playback-start",
                 Gtk.IconSize.BUTTON
             )
@@ -150,9 +153,28 @@ class MyWindow(Gtk.Window):
         self.playlistPage.set_border_width(10)
         self.playlistPage.add(Gtk.Label('Not implemented yet.'))
         self.notebook.append_page(
-        	self.playlistPage,
-        	Gtk.Image.new_from_icon_name(
+            self.playlistPage,
+            Gtk.Image.new_from_icon_name(
                 "user-bookmarks",
+                Gtk.IconSize.MENU
+            )
+        )
+
+        self.settingsPage = Gtk.Box()
+        self.settingsPage.set_border_width(10)
+
+        self.editWindow = Gtk.ScrolledWindow()
+        self.editWindow.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+
+        self.settingsListBox = Gtk.ListBox()
+        self.settingsListBox.set_selection_mode(Gtk.SelectionMode.NONE)
+        self.editWindow.add(self.settingsListBox)
+
+        self.settingsPage.add(self.editWindow)
+        self.notebook.append_page(
+            self.settingsPage,
+            Gtk.Image.new_from_icon_name(
+                "preferences-system",
                 Gtk.IconSize.MENU
             )
         )
