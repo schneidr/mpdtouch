@@ -12,11 +12,11 @@ The client is intended to run on a Raspberry Pi.
 * communication with MPD
 * display of play status
 * basic control (play, stop, prev, next)
+* status updates
 
 ### TODO ###
 
 * advanced control (pause, repeat, shuffle)
-* status updates
 * configurable settings
 
 ## Dependencies ##

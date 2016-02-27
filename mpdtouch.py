@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from gi.repository import Gtk
+from gi.repository import Gtk, GObject
 from mpd import MPDClient
 import cgi
 
@@ -228,6 +228,9 @@ class MyWindow(Gtk.Window):
 
         self.connect("delete-event", self.mainQuit)
 
+        # update window regularly
+        self.update = GObject.timeout_add(1000, self.updateMpd)
+
     def on_controlButtonPlayPause_clicked(self, b):
         self.client.play()
         self.updateMpd()
@@ -272,12 +275,7 @@ class MyWindow(Gtk.Window):
         seconds = seconds % 3600
         minutes = seconds / 60
         seconds = seconds % 60
-        if hours > 0:
-            result.append(str(hours))
-        if minutes > 0:
-            result.append(str(minutes))
-        result.append(str(seconds))
-        return ':'.join(result)
+        return "%(hours)02d:%(minutes)02d:%(seconds)02d" % {"hours":hours,"minutes":minutes,"seconds":seconds}
 
     def mainQuit(self, b, c):
         self.client.close()
@@ -318,6 +316,7 @@ class MyWindow(Gtk.Window):
             pass
         self.nowPlayingTrackTitle.set_markup("<b>" + cgi.escape(currentSong["title"]) + "</b>")
         self.nowPlayingTrackArtist.set_markup(cgi.escape(currentSong["name"]))
+        return True
 
 
 win = MyWindow()
