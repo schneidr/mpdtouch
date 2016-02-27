@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from gi.repository import Gtk
 from mpd import MPDClient
+import cgi
 
 # http://helloraspberrypi.blogspot.de/2013/12/install-and-program-with-gtk-30-in.html
 # https://oli4444.wordpress.com/2015/11/22/from-power-on-to-gtk-gui-usable-as-fast-as-possible/
@@ -8,7 +9,7 @@ from mpd import MPDClient
 
 class MyWindow(Gtk.Window):
 
-    mpdHost = "192.168.23.104"
+    mpdHost = "192.168.23.111"
     mpdPort = 6600
     mpdPassword = ""
 
@@ -70,6 +71,41 @@ class MyWindow(Gtk.Window):
         self.nowPlayingProgress.pack_start(self.progressbar, True, True, 0)
 
         self.nowPlayingPage.add(self.nowPlayingProgress)
+
+        # volume buttons
+        self.nowPlayingVolume = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+
+        self.volumeButtonUp = Gtk.Button()
+        self.volumeButtonUp.add(
+            Gtk.Image.new_from_icon_name(
+                "audio-volume-high",
+                Gtk.IconSize.BUTTON
+            )
+        )
+        self.volumeButtonUp.connect("clicked", self.on_volumeButtonUp_clicked)
+        self.nowPlayingVolume.pack_start(self.volumeButtonUp, True, True, 0)
+
+        self.volumeButtonDown = Gtk.Button()
+        self.volumeButtonDown.add(
+            Gtk.Image.new_from_icon_name(
+                "audio-volume-low",
+                Gtk.IconSize.BUTTON
+            )
+        )
+        self.volumeButtonDown.connect("clicked", self.on_volumeButtonDown_clicked)
+        self.nowPlayingVolume.pack_start(self.volumeButtonDown, True, True, 0)
+
+        self.volumeButtonMute = Gtk.Button()
+        self.volumeButtonMute.add(
+            Gtk.Image.new_from_icon_name(
+                "audio-volume-muted",
+                Gtk.IconSize.BUTTON
+            )
+        )
+        self.volumeButtonMute.connect("clicked", self.on_volumeButtonMute_clicked)
+        self.nowPlayingVolume.pack_start(self.volumeButtonMute, True, True, 0)
+
+        self.nowPlayingTrackDisplay.add(self.nowPlayingVolume)
 
         # control buttons
         self.nowPlayingControls = Gtk.Box(spacing=6)
@@ -208,6 +244,26 @@ class MyWindow(Gtk.Window):
         self.client.next()
         self.updateMpd()
 
+    def on_volumeButtonUp_clicked(self, b):
+        #self.client.
+        status = self.client.status()
+        vol = int(status["volume"]) + 1
+        if vol > 100:
+            vol = 100
+        self.client.setvol(vol)
+
+    def on_volumeButtonDown_clicked(self, b):
+        #self.client.
+        status = self.client.status()
+        vol = int(status["volume"]) - 1
+        if vol < 0:
+            vol = 0
+        self.client.setvol(vol)
+
+    def on_volumeButtonMute_clicked(self, b):
+        #self.client.
+        print("x")
+
     def format_time(self, input):
         nums = input.split(':')
         seconds = int(nums[0])
@@ -229,7 +285,6 @@ class MyWindow(Gtk.Window):
         Gtk.main_quit(self, b, c)
 
     def updateMpd(self):
-
         status = self.client.status()
         # {'songid': '1', 'playlistlength': '1', 'playlist': '132', 'repeat': '0', 'consume': '0', 
         # 'mixrampdb': '0.000000', 'random': '1', 'state': 'play', 'elapsed': '99.186', 'volume': '75', 
@@ -249,16 +304,20 @@ class MyWindow(Gtk.Window):
                     Gtk.IconSize.BUTTON
                 )
             )
-        self.controlButtonRepeat.set_active( status['repeat'] == '1' )
-        self.controlButtonShuffle.set_active( status['random'] == '1' )
+        self.controlButtonRepeat.set_active(status['repeat'] == '1')
+        self.controlButtonShuffle.set_active(status['random'] == '1')
 
         currentSong = self.client.currentsong()
         # {'id': '1', 'pos': '0', 'name': 'hr3', 
         # 'file': 'http://hr-mp3-m-h3.akacast.akamaistream.net/7/785/142133/v1/gnl.akacast.akamaistream.net/hr-mp3-m-h3', 
         # 'title': 'Bloodhound Gang - The bad touch'}
-        self.timeLabel.set_markup(self.format_time(status["time"]))
-        self.nowPlayingTrackTitle.set_markup("<b>" + currentSong["title"] + "</b>")
-        self.nowPlayingTrackArtist.set_markup(currentSong["name"])
+        try:
+            self.timeLabel.set_markup(self.format_time(status["time"]))
+        except KeyError:
+            self.timeLabel.set_markup("00:00")
+            pass
+        self.nowPlayingTrackTitle.set_markup("<b>" + cgi.escape(currentSong["title"]) + "</b>")
+        self.nowPlayingTrackArtist.set_markup(cgi.escape(currentSong["name"]))
 
 
 win = MyWindow()
